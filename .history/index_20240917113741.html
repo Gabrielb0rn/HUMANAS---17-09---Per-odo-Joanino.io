@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Interativo - Rio de Janeiro no Período Joanino</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="icon" href="resources\icon\icon.svg" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F0F1F2;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px;
+            background-color: #1C3059;
+            color: white;
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #mapContainer {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
+            transition: width 0.5s ease;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            transition: transform 0.5s ease;
+        }
+
+        #detailsContainer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 100%;
+            background-color: white;
+            box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+            padding: 20px;
+            overflow-y: auto;
+            transition: width 0.5s ease;
+        }
+
+        #detailsContainer.open {
+            width: 30%;
+        }
+
+        #mapContainer.shrink #map {
+            transform: translateX(-30%);
+        }
+
+        .details-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .details-content.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .details-content h2 {
+            font-size: 24px;
+            color: #1C3059;
+            margin-bottom: 10px;
+        }
+
+        .details-content p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .details-content img {
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #closeDetails {
+            cursor: pointer;
+            color: #1C3059;
+            padding: 5px 10px;
+            border: none;
+            background-color: transparent;
+            font-size: 18px;
+            float: right;
+        }
+
+        footer {
+            background-color: #1C3059;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        footer a {
+            color: #F2CF66;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #F2A285;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            #detailsContainer {
+                width: 100%;
+                height: 300px;
+                position: relative;
+            }
+
+            #mapContainer.shrink #map {
+                transform: translateX(0);
+            }
+
+            #detailsContainer.open {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Rio de Janeiro - Contrastes Sociais e Mudanças do Período Joanino</h1>
+
+    <!-- Contêiner do mapa e dos detalhes -->
+    <div id="mapContainer">
+        <!-- Mapa -->
+        <div id="map"></div>
+
+        <!-- Janela lateral para os detalhes -->
+        <div id="detailsContainer">
+            <button id="closeDetails">Fechar</button>
+            <div id="details" class="details-content">
+                <h2>Título do Ponto</h2>
+                <p>Descrição detalhada do acontecimento histórico...</p>
+                <img src="imagem_exemplo.jpg" alt="Imagem relacionada ao ponto">
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>Mapa Interativo - <a href="#">História do Brasil</a></p>
+        <p>&copy; 2024 - Todos os direitos reservados</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Inicializa o mapa
+        var map = L.map('map').setView([-22.9068, -43.1729], 12);
+
+        // Adiciona camada de fundo ao mapa
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Variável para armazenar o último marcador clicado
+        var lastClickedMarker = null;
+
+        // Ícones personalizados
+        var iconDefault = L.icon({
+            iconUrl: 'resources/pontonaoselecionado.svg',
+            iconSize: [38, 95],
+            iconAnchor: [22, 94],
+            popupAnchor: [-3, -76],
+            shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+            shadowSize: [50, 64],
+            shadowAnchor: [4, 62]
+        });
+
+        var iconSelected = L.icon({
+            iconUrl: 'resources/pontoselecionado.svg',
+            iconSize: [38, 95],
+            iconAnchor: [22, 94],
+            popupAnchor: [-3, -76],
+            shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+            shadowSize: [50, 64],
+            shadowAnchor: [4, 62]
+        });
+
+        // Lista de pontos
+        var pontos = [
+            { coords: [-22.9133, -43.1765], titulo: "Praça XV de Novembro", descricao: "História e Importância: No início do século XIX, a Praça XV de Novembro foi o centro do poder político no Rio de Janeiro, quando Dom João VI transferiu a sede do governo para o Brasil. O local também foi onde o Brasil proclamou sua independência em 1822.", img: "resources/fotos\Praça XV de Novembro\Captura de tela 2024-09-17 113651.png" },
+            { coords: [-22.9064, -43.1792], titulo: "Candelária", descricao: "A Igreja da Candelária...", img: "https://upload.wikimedia.org/wikipedia/commons/8/85/Igreja_da_Candelária_2020.jpg" },
+            // Adicione mais pontos aqui...
+        ];
+
+        // Função para adicionar marcadores no mapa
+        pontos.forEach(function(ponto) {
+            var marker = L.marker(ponto.coords, {icon: iconDefault}).addTo(map);
+            
+            marker.on('click', function() {
+                // Altera o ícone do último marcador clicado para o padrão
+                if (lastClickedMarker) {
+                    lastClickedMarker.setIcon(iconDefault);
+                }
+
+                // Altera o ícone do marcador clicado para o ícone selecionado
+                marker.setIcon(iconSelected);
+
+                lastClickedMarker = marker;
+
+                // Exibe os detalhes do ponto
+                document.getElementById('details').innerHTML = 
+                    '<h2>' + ponto.titulo + '</h2>' +
+                    '<p>' + ponto.descricao + '</p>' +
+                    '<img src="' + ponto.img + '" alt="' + ponto.titulo + '">';
+                document.getElementById('detailsContainer').classList.add('open');
+                document.getElementById('details').classList.add('show');
+                document.getElementById('mapContainer').classList.add('shrink');
+            }); 
+        });
+
+        // Função para fechar os detalhes e resetar o mapa
+        document.getElementById('closeDetails').addEventListener('click', function() {
+            document.getElementById('detailsContainer').classList.remove('open');
+            document.getElementById('details').classList.remove('show');
+            document.getElementById('mapContainer').classList.remove('shrink');
+
+            // Volta o marcador para a cor padrão
+            if (lastClickedMarker) {
+                lastClickedMarker.setIcon(L.icon({
+                    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+                    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png'
+                }));
+                lastClickedMarker = null;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #F0F1F2;
+}
+
+h1 {
+    text-align: center;
+    padding: 20px;
+    background-color: #1C3059;
+    color: white;
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#mapContainer {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    overflow: hidden;
+    transition: width 0.5s ease;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    transition: transform 0.5s ease;
+}
+
+#detailsContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 100%;
+    background-color: white;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+    padding: 20px;
+    overflow-y: auto;
+    transition: width 0.5s ease;
+}
+
+#detailsContainer.open {
+    width: 30%;
+}
+
+#mapContainer.shrink #map {
+    transform: translateX(-30%);
+}
+
+.details-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.details-content.show {
+    display: block;
+    opacity: 1;
+}
+
+.details-content h2 {
+    font-size: 24px;
+    color: #1C3059;
+    margin-bottom: 10px;
+}
+
+.details-content p {
+    color: #555;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.details-content img {
+    width: 100%;
+    margin-top: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#closeDetails {
+    cursor: pointer;
+    color: #1C3059;
+    padding: 5px 10px;
+    border: none;
+    background-color: transparent;
+    font-size: 18px;
+    float: right;
+}
+
+footer {
+    background-color: #1C3059;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+footer a {
+    color: #F2CF66;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #F2A285;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #detailsContainer {
+        width: 100%;
+        height: 300px;
+        position: relative;
+    }
+
+    #mapContainer.shrink #map {
+        transform: translateX(0);
+    }
+
+    #detailsContainer.open {
+        width: 100%;
+    }
+}
