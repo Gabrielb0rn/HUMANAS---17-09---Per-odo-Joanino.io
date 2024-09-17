@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Interativo - Rio de Janeiro no Período Joanino</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rio de Janeiro - Contrastes Sociais e Mudanças do Período Joanino</h1>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Inicializa o mapa
+        var map = L.map('map').setView([-22.9068, -43.1729], 12);
+
+        // Adiciona o tile layer do mapa (camada de fundo)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Lista de pontos com marcadores
+        var pontos = [
+            {
+                coords: [-22.9133, -43.1765],
+                titulo: "Praça XV de Novembro",
+                descricao: "Sede do governo durante o período joanino, onde D. João VI estabeleceu sua residência e o Paço Real. Representa o centro do poder político da época."
+            },
+            {
+                coords: [-22.9064, -43.1792],
+                titulo: "Candelária",
+                descricao: "A Igreja da Candelária era um dos principais símbolos religiosos da época, representando o poder da Igreja e suas ligações com a coroa."
+            },
+            {
+                coords: [-22.9137, -43.1991],
+                titulo: "Morro do Castelo",
+                descricao: "Área onde havia grandes contrastes sociais, sendo habitada por populações mais pobres, em contraste com o luxo da área central. Foi demolido no século XX."
+            },
+            {
+                coords: [-22.8966, -43.1801],
+                titulo: "Jardim Botânico",
+                descricao: "Criado por D. João VI, o Jardim Botânico mostra o avanço científico e econômico trazido pela abertura dos portos e o interesse pela flora exótica."
+            },
+            {
+                coords: [-22.9035, -43.1823],
+                titulo: "Praia de Botafogo",
+                descricao: "Área que passou a ser ocupada por aristocratas e famílias da elite, simbolizando as divisões econômicas na cidade."
+            },
+            {
+                coords: [-22.9122, -43.2302],
+                titulo: "Palácio de São Cristóvão",
+                descricao: "Também conhecido como Quinta da Boa Vista, foi residência oficial de D. João VI, destacando o contraste do luxo real com a pobreza em outras regiões."
+            },
+            {
+                coords: [-22.9059, -43.1775],
+                titulo: "Rua do Ouvidor",
+                descricao: "Centro comercial da época, representando o crescimento econômico da cidade e a circulação de produtos de luxo e importados com a abertura dos portos."
+            },
+            {
+                coords: [-22.9087, -43.1763],
+                titulo: "Convento do Carmo",
+                descricao: "Simboliza o poder da Igreja e seu papel na sociedade do Rio de Janeiro durante o período joanino, sendo próximo ao Paço Imperial."
+            }
+        ];
+
+        // Função para adicionar os pontos no mapa
+        pontos.forEach(function(ponto) {
+            var marker = L.marker(ponto.coords).addTo(map);
+            marker.bindPopup("<b>" + ponto.titulo + "</b><br>" + ponto.descricao);
+        });
+    </script>
+</body>
+</html>
