@@ -12,4 +12,4 @@
 ### PASSO 4
 - Realize as questões da GeekieOne referentes ao Cap. nº 18
 
-## Competências e habilidades: C5 H28 H29 H30 H31
+### Competências e habilidades: C5 H28 H29 H30 H31
